@@ -10,41 +10,45 @@ class PayrollController extends BaseController
 {
     public function index()
     {
-        $user=model(SalaryModel::class)->getSalary();
-         return view('users/payroll',['user'=>$user]);
+        $branch = $this->getBranch();
+        $user   = model(SalaryModel::class)->getSalary(10, $branch);
+        return view('users/payroll', ['user' => $user]);
     }
 
+    private function getBranch(): ?string
+    {
+        if (session('position') === 'Admin') {
+            return null;
+        }
+        $branch = session('branch');
+        return ($branch !== null && $branch !== '') ? $branch : '__none__';
+    }
     
     public function Report()
+    {
+        $from   = $this->request->getGet('from');
+        $to     = $this->request->getGet('to');
+        $branch = $this->getBranch();
 
-   {
-    
-         $from=$this->request->getGet('from');
-         $to=$this->request->getGet('to');
-       
-         dd($from,$to);
+        if (!empty($from) && !empty($to)) {
+            $builder = model('SalaryModel')->builder('salary')
+                ->select('salary.id,salary.created_at,salary.amount,users.name,users.id')
+                ->join('users', 'users.id = salary.user_id')
+                ->where('salary.created_at >=', $from)
+                ->where('salary.created_at <=', $to)
+                ->orderBy('salary.created_at', 'DESC');
 
-        
-        if(!empty($from) && !empty($to))
-        {
-            $user=model(UserModel::class)->findAll();
-            $salary=model('SalaryModel')
-            ->where('created_at >=',$from)
-            ->where('created_at <=',$to)
-            ->findAll();
-            
-            dd ($salary);
+            if ($branch === '__none__') {
+                $builder->where('1', '0');
+            } elseif ($branch !== null) {
+                $builder->where('users.branch', $branch);
+            }
 
-            return view('users/payroll',['salary'=>$salary,'user'=>$user]);  
-        }
-             elseif(empty($from) && empty($to)){
-            $salary=model(SalaryModel::class)->getTodaySalary();
-
-        
-          return view('users/payroll',['salary'=>$salary]);
-
+            $salary = $builder->get()->getResult();
+            return view('users/payroll', ['salary' => $salary, 'user' => $salary]);
         }
 
-
-}
+        $salary = model(SalaryModel::class)->TodaySalary($branch);
+        return view('users/payroll', ['salary' => $salary]);
+    }
 }

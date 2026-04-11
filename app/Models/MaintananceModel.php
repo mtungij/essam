@@ -13,7 +13,7 @@ class MaintananceModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'expenses', 'amount', 'suggestion', 'created_at'
+        'expenses', 'amount', 'suggestion', 'branch', 'created_at'
     ];
 
     // Dates
@@ -39,4 +39,15 @@ class MaintananceModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getByBranch(?string $branch = null)
+    {
+        if ($branch === '__none__') {
+            return [];
+        }
+        if ($branch !== null) {
+            return $this->where('branch', $branch)->findAll();
+        }
+        return $this->findAll();
+    }
 }

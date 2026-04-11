@@ -36,6 +36,8 @@ class Login extends BaseController
                 session()->set('username', $user->username);
                 session()->set('name', $user->name);
                 session()->set('position', $user->position);
+                session()->set('branch', $user->branch);
+                session()->set('profile_picture', $user->profile_picture);
                 return redirect()->to('/');
             } {
                 session()->setFlashdata("login_error", "Incorrect username or password");

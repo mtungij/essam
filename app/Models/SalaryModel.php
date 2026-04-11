@@ -42,30 +42,37 @@ class SalaryModel extends Model
 
 
 
-    public function getSalary($limit = 10)
+    public function getSalary($limit = 10, ?string $branch = null)
     {
         $builder = $this->db->table('salary');
         $builder->select('salary.id,salary.created_at,salary.amount,users.name,users.id');
         $builder->join('users', 'users.id = salary.user_id');
+        if ($branch === '__none__') {
+            $builder->where('1', '0');
+        } elseif ($branch !== null) {
+            $builder->where('users.branch', $branch);
+        }
         $builder->limit($limit);
         $query = $builder->get();
         return $query->getResult();
     }
 
-    public function TodaySalary()
+    public function TodaySalary(?string $branch = null)
     {
-     $builder = $this->db->table('salary');
-   $result = $builder->select('SUM(salary.amount) as amount, MAX(salary.created_at) as created_at, MAX(salary.id) as id, MAX(users.name) as name, MAX(users.username) as username')
-    ->join('users', 'users.id = salary.user_id')
-    ->where('DATE(salary.created_at)', date('Y-m-d'))
-    ->groupBy('users.name')
-    ->orderBy('created_at', 'DESC')  
-    ->get()
-    ->getResult();
+        $builder = $this->db->table('salary');
+        $builder->select('SUM(salary.amount) as amount, MAX(salary.created_at) as created_at, MAX(salary.id) as id, MAX(users.name) as name, MAX(users.username) as username')
+            ->join('users', 'users.id = salary.user_id')
+            ->where('DATE(salary.created_at)', date('Y-m-d'))
+            ->groupBy('users.name')
+            ->orderBy('created_at', 'DESC');
 
-return $result;
+        if ($branch === '__none__') {
+            $builder->where('1', '0');
+        } elseif ($branch !== null) {
+            $builder->where('users.branch', $branch);
+        }
 
-        
+        return $builder->get()->getResult();
     }
     
 }

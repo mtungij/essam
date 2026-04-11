@@ -11,10 +11,20 @@ use App\Models\UserModel;
 class SalioController extends BaseController
 {
     public function salio()
-    { $balanc=model(SalioModel::class)->Balance();
-        $salio=model(SalioModel::class)->findAll();
-        // dd($balanc);
-        return view('salio/balance',['salio' => $salio , 'balanc' => $balanc]);
+    {
+        $branch = $this->getBranch();
+        $balanc = model(SalioModel::class)->BalanceByBranch($branch);
+        $salio  = model(SalioModel::class)->getByBranch($branch);
+        return view('salio/balance', ['salio' => $salio, 'balanc' => $balanc]);
+    }
+
+    private function getBranch(): ?string
+    {
+        if (session('position') === 'Admin') {
+            return null;
+        }
+        $branch = session('branch');
+        return ($branch !== null && $branch !== '') ? $branch : '__none__';
     }
 
     public function create()

@@ -134,10 +134,22 @@
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position</label>
                                             <select id="position" name="position"
                                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                <option <?= old("position") == "Admin" ? "selected" : null ?> value="Admin">
-                                                    Staff</option>
-                                                <option <?= old("position") == "Staff" ? "selected" : null ?>
-                                                    value="Staff">Admin</option>
+                                                <option <?= old("position") == "Admin" ? "selected" : null ?> value="Admin">Admin</option>
+                                                <option <?= old("position") == "Staff" ? "selected" : null ?> value="Staff">Staff</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="branch"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Branch</label>
+                                            <select name="branch" id="branch"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                required>
+                                                <option value="">-- Select Branch --</option>
+                                                <?php foreach ($branches as $b): ?>
+                                                    <option value="<?= esc($b->name) ?>" <?= old('branch') === $b->name ? 'selected' : '' ?>>
+                                                        <?= esc($b->name) ?>
+                                                    </option>
+                                                <?php endforeach ?>
                                             </select>
                                         </div>
                                         <div>
@@ -177,6 +189,7 @@
                         <th scope="col" class="px-4 py-3">NAME</th>
                         <th scope="col" class="px-4 py-3">USERNAME</th>
                         <th scope="col" class="px-4 py-3">POSITION</th>
+                        <th scope="col" class="px-4 py-3">BRANCH</th>
                         <th scope="col" class="px-4 py-3">
                             <span class="sr-only">Actions</span>
                         </th>
@@ -197,6 +210,9 @@
                             </td>
                             <td class="px-4 py-3">
                                 <?= $user->position ?>
+                            </td>
+                            <td class="px-4 py-3">
+                                <?= esc($user->branch ?? '—') ?>
                             </td>
                             <td class="px-4 py-3 flex items-center justify-end">
                                 <button id="<?= $user->id ?>-button" data-dropdown-toggle="<?= $user->id ?>"

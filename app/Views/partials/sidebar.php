@@ -1,7 +1,7 @@
 <aside
-            class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-indigo-900  border-r  md:translate-x-0 "
+            class="fixed top-0 left-0 z-40 w-72 max-w-[85vw] md:w-64 h-screen pt-14 transition-transform -translate-x-full bg-indigo-900 border-r shadow-xl md:shadow-none md:translate-x-0 "
             aria-label="Sidenav" id="drawer-navigation">
-            <div class="overflow-y-auto py-5 px-3 h-full dark:bg-slate-900">
+            <div class="overflow-y-auto overflow-x-hidden py-4 px-3 h-full dark:bg-slate-900">
                 <form action="#" method="GET" class="md:hidden mb-2">
                     <label for="sidebar-search" class="sr-only">Search</label>
                     <div class="relative">
@@ -23,10 +23,10 @@
 <div class="mb-4 border-b  dark:border-gray-700">
     <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab" data-tabs-toggle="#default-tab-content" role="tablist">
         <li class="me-2" role="presentation">
-            <button class="inline-block p-4 border-b-2  text-white font-bold  hover:bg-yellow-400 rounded-t-lg" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Menu</button>
+            <button class="inline-block p-3 sm:p-4 border-b-2 text-white font-bold hover:bg-yellow-400 rounded-t-lg" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Menu</button>
         </li>
         <li class="me-2" role="presentation">
-            <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-600 text-white font-bold  hover:bg-yellow-400" id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Reports</button>
+            <button class="inline-block p-3 sm:p-4 border-b-2 rounded-t-lg hover:text-600 text-white font-bold hover:bg-yellow-400" id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Reports</button>
         </li>
       
     </ul>
@@ -90,15 +90,18 @@
                                 <a href="/payroll"
                                     class="flex items-center p-2 pl-11 w-full text-base font-medium text-white rounded-lg transition duration-75 group hover:bg-yellow-400 dark:text-white dark:hover:bg-gray-700">Salary Sheet</a>
                             </li> -->
-                        </ul>
-                    </li>
-                    <?php endif ?>
-                    <?php if(session('position')=='Admin'):?>
-                    <li>
-                        <a href="/salio"
-                            class="flex items-center p-2 text-base font-medium text-white rounded-lg dark:text-white hover:bg-yellow-400 dark:hover:bg-gray-700 group">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scale"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
-                            <span class="flex-1 ml-3 whitespace-nowrap text-white">Monthly Balance</span>
+                            <li>
+                                <a href="/users"
+                                    class="flex items-center p-2 pl-11 w-full text-base font-medium text-white rounded-lg transition duration-75 group hover:bg-yellow-400 dark:text-white dark:hover:bg-gray-700">Register Staff</a>
+                            </li>
+                            <li>
+                                <a href="/branches"
+                                    class="flex items-center p-2 pl-11 w-full text-base font-medium text-white rounded-lg transition duration-75 group hover:bg-yellow-400 dark:text-white dark:hover:bg-gray-700">Manage Branches</a>
+                            </li>
+                            <li>
+                                <a href="/salary"
+                                    class="flex items-center p-2 pl-11 w-full text-base font-medium text-white rounded-lg transition duration-75 group hover:bg-yellow-400 dark:text-white dark:hover:bg-gray-700">Pay Salary</a>
+                            </li>
                         </a>
                     </li>
                     

@@ -39,12 +39,18 @@ class OrdersModel extends Model
     protected $afterDelete    = [];
 
 
-    public function getOrders(?int $perPage = null): array
+    public function getOrders(?int $perPage = null, ?string $branch = null): array
     {
         $this->builder()
             ->select('orders.*, users.username')
             ->join('users', 'orders.user_id = users.id')
             ->orderBy('orders.created_at', 'DESC');
+
+        if ($branch === '__none__') {
+            $this->builder()->where('1', '0'); // no results
+        } elseif ($branch !== null) {
+            $this->builder()->where('users.branch', $branch);
+        }
 
         return [
             'orders'  => $this->paginate($perPage),
@@ -52,13 +58,19 @@ class OrdersModel extends Model
         ];
     }
 
-    public function search(string $search): array
+    public function search(string $search, ?string $branch = null): array
     {
         $this->builder()
             ->select('orders.*, users.username')
             ->join('users', 'orders.user_id = users.id')
             ->orderBy('orders.created_at', 'DESC')
             ->like('orders.customer', $search);
+
+        if ($branch === '__none__') {
+            $this->builder()->where('1', '0');
+        } elseif ($branch !== null) {
+            $this->builder()->where('users.branch', $branch);
+        }
 
         return [
             'orders'  => $this->paginate(),
@@ -67,14 +79,21 @@ class OrdersModel extends Model
     }
 
 
-    public function getTodayOrders()
+    public function getTodayOrders(?string $branch = null)
     {
-       $data = $this->builder()
+        $builder = $this->builder()
             ->select('orders.*, users.username')
             ->join('users', 'orders.user_id = users.id')
             ->where('DATE(orders.created_at)', date('Y-m-d'))
-            ->orderBy('orders.created_at', 'DESC')->get()->getResult();
-        return $data;
+            ->orderBy('orders.created_at', 'DESC');
+
+        if ($branch === '__none__') {
+            $builder->where('1', '0');
+        } elseif ($branch !== null) {
+            $builder->where('users.branch', $branch);
+        }
+
+        return $builder->get()->getResult();
     }
 }
 

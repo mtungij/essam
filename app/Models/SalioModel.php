@@ -46,17 +46,46 @@ class SalioModel extends Model
 
 
 $builder = $this->db->table('salio');
-$query = $builder->select('SUM(income) as income, payment_method')
-    ->groupBy('payment_method')
-    ->orderBy('income', 'DESC')
-    ->get()
-    ->getResult();
+    $query = $builder->select('SUM(income) as income, payment_method')
+        ->groupBy('payment_method')
+        ->orderBy('income', 'DESC')
+        ->get()
+        ->getResult();
     return $query;
-
-
 }
 
- }
+    public function getByBranch(?string $branch = null)
+    {
+        $builder = $this->db->table('salio');
+        $builder->select('salio.*')
+            ->join('users', 'users.id = salio.user_id');
+
+        if ($branch === '__none__') {
+            $builder->where('1', '0');
+        } elseif ($branch !== null) {
+            $builder->where('users.branch', $branch);
+        }
+
+        return $builder->get()->getResult();
+    }
+
+    public function BalanceByBranch(?string $branch = null)
+    {
+        $builder = $this->db->table('salio');
+        $builder->select('SUM(salio.income) as income, salio.payment_method')
+            ->join('users', 'users.id = salio.user_id')
+            ->groupBy('salio.payment_method')
+            ->orderBy('income', 'DESC');
+
+        if ($branch === '__none__') {
+            $builder->where('1', '0');
+        } elseif ($branch !== null) {
+            $builder->where('users.branch', $branch);
+        }
+
+        return $builder->get()->getResult();
+    }
+}
 
 
 

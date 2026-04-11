@@ -19,16 +19,26 @@
                   <input type="text" name="username" value="<?= $user->username?>" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required="">
               </div>
               <div>
-                  <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-                  <select id="category" value="<?= $user->position?>" name="position" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                      <option selected="">Select category</option>
-                      <option <?= $user->position == "Staff" ? "selected" : null ?> value="Staff">Staff</option>
+                  <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position</label>
+                  <select id="category" name="position" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                       <option <?= $user->position == "Admin" ? "selected" : null ?> value="Admin">Admin</option>
-
+                      <option <?= $user->position == "Staff" ? "selected" : null ?> value="Staff">Staff</option>
                   </select>
               </div>
-               
-              
+              <div class="w-full">
+                  <label for="branch" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Branch</label>
+                  <select name="branch" id="branch"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      required>
+                      <option value="">-- Select Branch --</option>
+                      <?php foreach ($branches as $b): ?>
+                          <option value="<?= esc($b->name) ?>" <?= (old('branch', $user->branch ?? '') === $b->name) ? 'selected' : '' ?>>
+                              <?= esc($b->name) ?>
+                          </option>
+                      <?php endforeach ?>
+                  </select>
+              </div>
+
           </div>
           <button type="submit" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
               Update Staff

@@ -2,6 +2,7 @@
 
 use App\Controllers\User;
 use App\Controllers\UserData;
+use App\Controllers\BranchController;
 use CodeIgniter\Router\RouteCollection;
 
 /**
@@ -18,6 +19,11 @@ $routes->get('users/edit/(:segment)',[User::class,'edit']);
 $routes->post('users/update',[User::class,'update']);
 $routes->get('salary','User::salary');
 $routes->post('paysalary','User::paysalary');
+$routes->get('profile/picture', 'User::profilePictureView');
+$routes->get('profile/password', 'User::changePasswordView');
+$routes->get('profile/settings', 'User::profileSettings');
+$routes->post('profile/password', 'User::updatePassword');
+$routes->post('profile/picture', 'User::updateProfilePicture');
 $routes ->get('logout','User::logout');
 
 //orders routes
@@ -29,6 +35,7 @@ $routes->group('orders', function ($routes) {
     $routes->post('update', 'OrdersController::update');
     $routes->post('delete', 'OrdersController::delete');
     $routes->get('todayorders', 'OrdersController::todayOrders');
+    $routes->get('todayorders/download', 'OrdersController::downloadTodayOrders');
     $routes->get('searchorders','OrdersController::oldOrders');
    
     $routes->get('previousorders/(:segment)/(:segment)', 'OrdersController::previous/$1/$2');
@@ -50,4 +57,11 @@ $routes ->get('MatengenezoReport','MaintananceController::MatengenezoReport');
 //payroll routes
 $routes->get('payroll','PayrollController::index');
 $routes ->get('salaryReport','PayrollController::Report');
+
+// branch routes (admin only)
+$routes->get('branches', [BranchController::class, 'index']);
+$routes->post('branches/store', [BranchController::class, 'store']);
+$routes->get('branches/edit/(:segment)', 'BranchController::edit/$1');
+$routes->post('branches/update', [BranchController::class, 'update']);
+$routes->post('branches/delete', [BranchController::class, 'delete']);
 
