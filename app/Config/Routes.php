@@ -37,6 +37,7 @@ $routes->group('orders', function ($routes) {
     $routes->get('todayorders', 'OrdersController::todayOrders');
     $routes->get('todayorders/download', 'OrdersController::downloadTodayOrders');
     $routes->get('searchorders','OrdersController::oldOrders');
+    $routes->get('searchorders/download', 'OrdersController::downloadOldOrdersFiltered');
    
     $routes->get('previousorders/(:segment)/(:segment)', 'OrdersController::previous/$1/$2');
 

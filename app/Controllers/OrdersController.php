@@ -247,8 +247,8 @@ private function getOrdersByFilters(string $from, string $to, string $selectedBr
 
 public function oldOrders()
 {
-    $start = $this->request->getGet('start');
-    $end = $this->request->getGet('end');
+    $startInput = trim((string) $this->request->getGet('start'));
+    $endInput = trim((string) $this->request->getGet('end'));
 
     
     //    dd($start);
@@ -256,7 +256,22 @@ public function oldOrders()
     
     $branch = $this->getBranch();
 
-    if (!empty($start) && !empty($end)) {
+    if (!empty($startInput) && !empty($endInput)) {
+        $start = $this->normalizeSearchDate($startInput);
+        $end = $this->normalizeSearchDate($endInput);
+
+        if ($start === null || $end === null) {
+            return view('orders/oldorders', [
+                'orders' => [],
+                'data' => "Use date format <b class='font-semibold text-gray-900 dark:text-white'>dd/mm/yy</b> (example: <b>14/04/26</b>).",
+            ]);
+        }
+
+        if ($start > $end) {
+            [$start, $end] = [$end, $start];
+            [$startInput, $endInput] = [$endInput, $startInput];
+        }
+
         $ordersModel = model(OrdersModel::class);
         if ($branch === '__none__') {
             $orders = [];
@@ -266,19 +281,105 @@ public function oldOrders()
                 $ordersModel->where('users.branch', $branch);
             }
             $orders = $ordersModel
-                ->where('orders.created_at >=', $start)
-                ->where('orders.created_at <=', $end)
+                ->where('DATE(orders.created_at) >=', $start)
+                ->where('DATE(orders.created_at) <=', $end)
                 ->findAll();
         }
 
-        $date = "<b class='font-semibold text-gray-900 dark:text-white'>$start</b> to <b>$end</b>";
+        $date = "<b class='font-semibold text-gray-900 dark:text-white'>$startInput</b> to <b>$endInput</b>";
         return view('orders/oldorders', ['orders' => $orders, 'data' => $date]);
 
-    } elseif (empty($start) && empty($end)) {
+    } elseif (empty($startInput) && empty($endInput)) {
         $orders = model('OrdersModel')->getTodayOrders($branch);
         $date   = date('d-m-Y');
         return view('orders/oldorders', ['orders' => $orders, 'data' => $date]);
     }
+}
+
+public function downloadOldOrdersFiltered()
+{
+    $startInput = trim((string) $this->request->getGet('start'));
+    $endInput = trim((string) $this->request->getGet('end'));
+
+    if ($startInput === '' || $endInput === '') {
+        return redirect()->to('/orders/searchorders');
+    }
+
+    $start = $this->normalizeSearchDate($startInput);
+    $end = $this->normalizeSearchDate($endInput);
+
+    if ($start === null || $end === null) {
+        return redirect()->to('/orders/searchorders?start=' . urlencode($startInput) . '&end=' . urlencode($endInput));
+    }
+
+    if ($start > $end) {
+        [$start, $end] = [$end, $start];
+        [$startInput, $endInput] = [$endInput, $startInput];
+    }
+
+    $branch = $this->getBranch();
+
+    if ($branch === '__none__') {
+        $orders = [];
+    } else {
+        $builder = db_connect()->table('orders')
+            ->select('orders.*, users.username, users.branch')
+            ->join('users', 'orders.user_id = users.id')
+            ->where('DATE(orders.created_at) >=', $start)
+            ->where('DATE(orders.created_at) <=', $end)
+            ->orderBy('orders.created_at', 'DESC');
+
+        if ($branch !== null) {
+            $builder->where('users.branch', $branch);
+        }
+
+        $orders = $builder->get()->getResult();
+    }
+
+    $titleParts = ['ORDER REPORT'];
+    $titleParts[] = "FROM {$startInput} TO {$endInput}";
+    if ($branch !== null && $branch !== '__none__') {
+        $titleParts[] = "BRANCH: {$branch}";
+    }
+
+    $mpdf = $this->createMpdf();
+    $mpdf->AddPage('L');
+    $html = view('reports/ordersReport', [
+        'orders' => $orders,
+        'title'  => implode(' | ', $titleParts),
+    ]);
+    $mpdf->WriteHTML($html);
+    $this->response->setHeader('Content-Type', 'application/pdf');
+    $mpdf->Output('orders_filtered_report.pdf', 'I');
+}
+
+private function normalizeSearchDate(string $value): ?string
+{
+    $value = trim($value);
+
+    if ($value === '') {
+        return null;
+    }
+
+    // Preferred format: dd/mm/yy (e.g. 14/04/26).
+    $date = \DateTime::createFromFormat('d/m/y', $value);
+    if ($date instanceof \DateTime) {
+        return $date->format('Y-m-d');
+    }
+
+    // Also allow dd/mm/yyyy input from users.
+    $date = \DateTime::createFromFormat('d/m/Y', $value);
+    if ($date instanceof \DateTime) {
+        return $date->format('Y-m-d');
+    }
+
+    // Backward compatibility for existing yyyy-mm-dd links/bookmarks.
+    $date = \DateTime::createFromFormat('Y-m-d', $value);
+    if ($date instanceof \DateTime) {
+        return $date->format('Y-m-d');
+    }
+
+    return null;
 }
 
 public function todayreport()
